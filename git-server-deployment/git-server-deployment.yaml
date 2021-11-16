@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: git-server
+  name: git-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: git-server
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      name: git-server-pod
+      labels:
+        app: git-server
+    spec:
+      containers:
+        - image: jkarlos/git-server-docker
+          name: git-server
+          ports:
+            - containerPort: 22
+          resources: {}
+          volumeMounts:
+            - mountPath: /git-server/keys
+              name: git-server-claim0
+            - mountPath: /git-server/repos
+              name: git-server-claim1
+      restartPolicy: Always
+      volumes:
+        - name: git-server-claim0
+          persistentVolumeClaim:
+            claimName: git-server-claim0
+        - name: git-server-claim1
+          persistentVolumeClaim:
+            claimName: git-server-claim1
